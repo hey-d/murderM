@@ -1,0 +1,16 @@
+t # Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment secrets (CRITICAL)
+.env
+server/.env
+client/.env
+
+# Production builds
+client/build/
+
+# Operating system logs
+.DS_Store
+Thumbs.db
