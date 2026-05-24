@@ -1,44 +1,28 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const GameRoomSchema = new mongoose.Schema({
-  roomCode: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    uppercase: true,
-  },
-  status: {
-    type: String,
-    enum: ["LOBBY", "ACTIVE", "COMPLETED"],
-    default: "LOBBY",
-  },
-  secretKiller: { type: String, required: true },
-  questionsRemaining: {
-    type: Number,
-    detault: 15,
-  },
-  cluesUnlocked: [
-    { type: String }
- ],
-  investigators: [
-    {
-        socketId: {type: String, required: true},
-        name: {type: String, default: "Anonymous Detective"}
-    }
-  ],
-  chatHistory: [
-    {
-        sender: {type: String, required: true},
-        messageText: {type: String, required: true},
-        timestamp: {type: Date, default: Date.now}
-    }
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 86400
-  }
+const PlayerSchema = new mongoose.Schema({
+  socketId: { type: String, required: true },
+  name: { type: String, required: true },
+  vote: { type: String, default: null }
 });
 
-module.exports = mongoose.model("GameRoom", GameRoomSchema);
+const ChatMessageSchema = new mongoose.Schema({
+  sender: { type: String, required: true },
+  messageText: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const GameRoomSchema = new mongoose.Schema({
+  roomCode: { type: String, required: true, unique: true, uppercase: true },
+  hostSocketId: { type: String, required: true },
+  status: { type: String, enum: ['LOBBY', 'ACTIVE', 'VOTING'], default: 'LOBBY' },
+  questionsRemaining: { type: Number, default: 15 },
+  secretKiller: { type: String, required: true },
+  players: [PlayerSchema],
+  
+  // SECREGATED CHAT DATA PIPELINES
+  teamChatHistory: [ChatMessageSchema], 
+  aiChatHistory: [ChatMessageSchema]
+}, { timestamps: true });
+
+module.exports = mongoose.model('GameRoom', GameRoomSchema);

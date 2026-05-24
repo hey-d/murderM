@@ -40,48 +40,57 @@ exports.createRoom = async (req, res) => {
 // 2. Interrogation Core: Simply reads who the killer is from the database
 exports.interrogateSuspect = async (roomCode, suspectKey, questionText, senderName) => {
   try {
+    // 1. Fetch Room State
     const room = await GameRoom.findOne({ roomCode: roomCode.toUpperCase() });
-    if (!room) throw new Error("Game room instance not found.");
-    if (room.questionsRemaining <= 0) throw new Error("No interrogation attempts remaining.");
+    if (!room) throw new Error("Target instance room not found");
 
-    // 👈 Check guilt cleanly by reading what we saved in the DB
-    const isThisSuspectTheKiller = room.secretKiller === suspectKey.toUpperCase();
+    // 2. CRASH BUG GUARD: Force arrays to handle memory context loops gracefully
+    const aiChatHistory = room.aiChatHistory || [];
 
-    // Fetch prompt template using our true state
-    const systemInstruction = getSuspectInstruction(suspectKey.toUpperCase(), isThisSuspectTheKiller);
+    // 3. System Instruction Persona Formulation Setup
+    let systemInstruction = `You are playing the role of ${suspectKey} in a cyberpunk sci-fi murder mystery game.\n`;
+    systemInstruction += `The active suspects are: VANCE (The Butler), SCARLET (The Heiress), and MUSTARD (The Colonel).\n`;
+    
+    if (room.secretKiller === suspectKey.toUpperCase()) {
+      systemInstruction += `SECRET PROTOCOL: You are the secret killer. Deflect suspicion, claim reasonable alibis, and subtly throw suspicion onto either SCARLET or MUSTARD. Never confess instantly.\n`;
+    } else {
+      systemInstruction += `SECRET PROTOCOL: You are entirely innocent. Defend your file records cleanly and truthfully, and help detectives parse discrepancies.\n`;
+    }
 
-    // Reconstruct the chat history context
-    let contextualHistory = "Here is the log of previous dialogue in this interrogation room:\n";
-    room.chatHistory.forEach((log) => {
-      contextualHistory += `${log.sender}: ${log.messageText}\n`;
+    // 4. Trace Conversation Context Records
+    let transcriptContext = "\nHere is the ongoing log transcript:\n";
+    aiChatHistory.forEach((msg) => {
+      transcriptContext += `${msg.sender}: ${msg.messageText}\n`;
     });
 
-    const compiledPrompt = `
-      ${systemInstruction}
-      
-      ${contextualHistory}
-      
-      Current Investigator Question from ${senderName}: "${questionText}"
-      Respond in character now:
-    `;
-
-    const result = await geminiModel.generateContent(compiledPrompt);
-    const response = await result.response;
-    const suspectReplyText = response.text().trim();
-
-    // Update game states
-    room.questionsRemaining -= 1;
-    room.chatHistory.push({ sender: senderName, messageText: questionText });
-    room.chatHistory.push({ sender: suspectKey.toUpperCase(), messageText: suspectReplyText });
+    // 5. Query Active Generation Pipe Line
     
+    const fullPrompt = `${systemInstruction}\n${transcriptContext}\n${senderName}: ${questionText}\n${suspectKey}:`;
+    
+    const result = await geminiModel.generateContent(fullPrompt);
+    let aiReplyText = result.response.text().trim();
+
+    // Fallback security checks in case token response generation is empty
+    if (!aiReplyText) {
+      aiReplyText = "My core cognitive links are resetting. Re-send query authorization packet.";
+    }
+
+    // 6. Step down parameters state counter values
+    if (room.questionsRemaining > 0) {
+      room.questionsRemaining -= 1;
+    }
     await room.save();
 
     return {
-      reply: suspectReplyText,
+      reply: aiReplyText,
       questionsRemaining: room.questionsRemaining
     };
+
   } catch (error) {
-    console.error("AI Interrogation pipeline failure:", error);
-    throw error;
+    console.error("❌ Controller Engine Interface Error Error:", error);
+    return {
+      reply: "📡 [COMMS CHANNEL INTERFERENCE]: The suspect's digital feed experienced a packet failure. Try again.",
+      questionsRemaining: 15
+    };
   }
 };
