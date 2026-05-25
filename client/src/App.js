@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
-const acessurl = "https://murderm-backend.onrender.com/";
+const acessurl = "https://murderm-backend.onrender.com";
 const socket = io(acessurl);
 
 function App() {
@@ -9,6 +9,13 @@ function App() {
   const [roomCode, setRoomCode] = useState("");
   const [inRoom, setInRoom] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Core Sync States
   const [players, setPlayers] = useState([]);
@@ -175,9 +182,7 @@ function App() {
             border: "1px solid #38bdf8",
           }}
         >
-          <h2 style={{ textAlign: "center", color: "#38bdf8" }}>
-            🕵️‍♂️ CRYPTO MANOR DETECTIVE
-          </h2>
+          <h2 style={{ textAlign: "center", color: "#38bdf8" }}>🕵️‍♂️ MurderM</h2>
           <input
             style={{
               width: "100%",
@@ -205,7 +210,7 @@ function App() {
             }}
             onClick={handleCreateRoom}
           >
-            ESTABLISH NEW SESSION
+            CREATE ROOM
           </button>
           <div style={{ display: "flex", gap: "5px" }}>
             <input
@@ -231,7 +236,7 @@ function App() {
               }}
               onClick={handleJoinRoom}
             >
-              JOIN CORE
+              JOIN ROOM
             </button>
           </div>
         </div>
@@ -239,7 +244,7 @@ function App() {
     );
   }
 
-  if (roomStatus === "LOBBY") {
+  if (roomStatus?.toUpperCase() === "LOBBY") {
     return (
       <div
         style={{
@@ -292,7 +297,7 @@ function App() {
               }}
               onClick={() => socket.emit("start_game", { roomCode })}
             >
-              ⚡ INITIALIZE CORE PROTOCOLS
+              ⚡ START GAME
             </button>
           ) : (
             <p style={{ textAlign: "center", color: "#eab308" }}>
@@ -336,7 +341,7 @@ function App() {
           <span
             style={{ fontSize: "12px", color: "#ef4444", letterSpacing: "2px" }}
           >
-            🚨 DOSSIER INTERCEPT [{currentIntroIndex + 1}/3]
+            🚨 SUSPECT[{currentIntroIndex + 1}/3]
           </span>
           <div
             style={{
@@ -399,6 +404,7 @@ function App() {
     <div
       style={{
         display: "flex",
+        flexDirection: isMobile ? "column" : "row", // ⭐ THIS LINE
         height: "100vh",
         backgroundColor: "#0f172a",
         color: "#fff",
@@ -408,11 +414,13 @@ function App() {
       }}
     >
       {/* LEFT SIDE PANEL: ROSTER + LIVE PLAYER BALLOTS */}
+      {/* LEFT SIDE PANEL: ROSTER + LIVE PLAYER BALLOTS */}
       <div
         style={{
-          width: "280px",
+          width: isMobile ? "100%" : "280px",
           background: "#1e293b",
-          borderRight: "1px solid #334155",
+          borderRight: isMobile ? "none" : "1px solid #334155",
+          borderBottom: isMobile ? "1px solid #334155" : "none",
           padding: "20px",
           display: "flex",
           flexDirection: "column",
@@ -566,21 +574,22 @@ function App() {
       </div>
 
       {/* OVERLAY CHAT DRAWER */}
+      {/* OVERLAY CHAT DRAWER */}
       {isChatOpen && (
         <div
           style={{
-            position: "absolute",
+            position: isMobile ? "fixed" : "absolute",
             top: 0,
-            left: "280px",
-            width: "320px",
+            left: isMobile ? 0 : "280px",
+            width: isMobile ? "100%" : "320px",
             height: "100%",
             background: "#111827",
             borderRight: "1px solid #38bdf8",
             display: "flex",
             flexDirection: "column",
             padding: "15px",
-            zIndex: 5,
-            boxShadow: "10px 0 15px rgba(0,0,0,0.3)",
+            zIndex: 20,
+            boxShadow: isMobile ? "none" : "10px 0 15px rgba(0,0,0,0.3)",
           }}
         >
           <div
@@ -720,14 +729,20 @@ function App() {
                   below:
                 </p>
                 <div
-                  style={{ display: "flex", gap: "25px", marginTop: "30px" }}
+                  style={{
+                    display: "flex",
+                    gap: "25px",
+                    marginTop: "30px",
+                    flexWrap: isMobile ? "wrap" : "nowrap",
+                    justifyContent: isMobile ? "center" : "flex-start",
+                  }}
                 >
                   {suspectsProfile.map((s) => (
                     <div
                       key={s.key}
                       style={{
                         background: "#1e293b",
-                        width: "220px",
+                        width: isMobile ? "100%" : "220px",
                         padding: "20px",
                         border: "1px solid #475569",
                         borderRadius: "6px",
@@ -795,7 +810,13 @@ function App() {
               overflowY: "auto",
             }}
           >
-            <div style={{ display: "flex", gap: "15px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: "15px",
+              }}
+            >
               {suspectsProfile.map((s) => (
                 <div
                   key={s.key}
@@ -886,6 +907,7 @@ function App() {
                   background: "#000",
                   borderRadius: "4px",
                   marginBottom: "10px",
+                  paddingBottom: isMobile ? "70px" : "10px",
                 }}
               >
                 {aiMessages.map((m, i) => {
@@ -924,7 +946,15 @@ function App() {
 
               <form
                 onSubmit={sendInterrogation}
-                style={{ display: "flex", gap: "5px" }}
+                style={{
+                  display: "flex",
+                  gap: "5px",
+                  position: isMobile ? "sticky" : "relative",
+                  bottom: 0,
+                  background: isMobile ? "#111827" : "transparent",
+                  padding: isMobile ? "10px" : "0",
+                  borderTop: isMobile ? "1px solid #ef4444" : "none",
+                }}
               >
                 <input
                   style={{
