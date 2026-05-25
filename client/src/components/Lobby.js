@@ -20,7 +20,7 @@ function Lobby({ onJoinSuccess }) {
 
     try {
       // Direct post call to your clean updated route endpoint
-      const response = await axios.post("http://murderm-backend.onrender.com/api/game/create");
+      const response = await axios.post("https://murderm-backend.onrender.com/api/game/create");
       const { roomCode } = response.data;
       
       // Hand the established state configurations up to App.js

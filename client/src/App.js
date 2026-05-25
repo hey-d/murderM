@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
-const acessurl = "http://murderm-backend.onrender.com/";
+const acessurl = "https://murderm-backend.onrender.com/";
 const socket = io(acessurl);
 
 function App() {
