@@ -950,8 +950,6 @@ function App() {
                 style={{
                   display: "flex",
                   gap: "5px",
-                  position: isMobile ? "sticky" : "relative",
-                  bottom: 0,
                   background: isMobile ? "#111827" : "transparent",
                   padding: isMobile ? "10px" : "0",
                   borderTop: isMobile ? "1px solid #ef4444" : "none",
