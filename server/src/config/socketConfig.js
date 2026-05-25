@@ -5,7 +5,7 @@ const GameRoom = require("../models/GameRoom");
 const dotenv  = require('dotenv')
 dotenv.config();
 
-const allowedOrigin = process.env.FRONTEND_URL
+const allowedOrigin = "https://murder-m-frontend.vercel.app/"
 
 const setupSocket = (server) => {
   const io = new Server(server, {
