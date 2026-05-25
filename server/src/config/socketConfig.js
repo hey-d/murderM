@@ -1,10 +1,11 @@
 const { Server } = require("socket.io");
 const { interrogateSuspect } = require("../controllers/gameController");
+const { createRoom } = require("../controllers/gameController")
 const GameRoom = require("../models/GameRoom");
 const dotenv  = require('dotenv')
 dotenv.config();
 
-const allowedOrigin = process.env.FRONTEND_URL
+const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:3000"
 
 const setupSocket = (server) => {
   const io = new Server(server, {
@@ -157,17 +158,18 @@ const setupSocket = (server) => {
         const room = await GameRoom.findOne({ roomCode: targetRoom });
         if (!room || room.status !== "ACTIVE" || room.questionsRemaining <= 0) return;
 
-        const playerMsg = { sender: senderName, messageText: questionText, timestamp: new Date() };
+        const playerMsg = { sender: senderName.toUpperCase(), messageText: questionText, timestamp: Date.now()};
         room.aiChatHistory.push(playerMsg);
         io.to(targetRoom).emit("receive_ai_chat", playerMsg);
 
         const aiResult = await interrogateSuspect(targetRoom, suspectKey, questionText, senderName);
 
-        const suspectMsg = { sender: suspectKey.toUpperCase(), messageText: aiResult.reply, timestamp: new Date() };
+        const suspectMsg = { sender: suspectKey.toUpperCase(), messageText: aiResult.reply, timestamp: Date.now() };
         room.aiChatHistory.push(suspectMsg);
         room.questionsRemaining = aiResult.questionsRemaining;
 
         if (room.questionsRemaining <= 0) {
+          await setTimeout(10000);
           room.status = "VOTING";
         }
         await room.save();

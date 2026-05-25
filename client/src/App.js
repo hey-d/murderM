@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
-import { configDotenv } from "dotenv";
 
-const acessurl = process.env.SOCKET_URL;
+const acessurl = "http://localhost:5000";
 const socket = io(acessurl);
 
 function App() {
