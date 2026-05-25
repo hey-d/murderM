@@ -409,7 +409,7 @@ function App() {
         backgroundColor: "#0f172a",
         color: "#fff",
         fontFamily: "monospace",
-        overflow: "hidden",
+        overflow: isMobile ? "auto" : "hidden",
         position: "relative",
       }}
     >
