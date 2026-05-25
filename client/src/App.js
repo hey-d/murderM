@@ -808,6 +808,7 @@ function App() {
               padding: "20px",
               gap: "20px",
               overflowY: "auto",
+              paddingBottom: isMobile ? "80px" : "20px",
             }}
           >
             <div
@@ -884,7 +885,7 @@ function App() {
                 border: "1px solid #ef4444",
                 borderRadius: "6px",
                 padding: "15px",
-                overflow: "hidden",
+                overflow: "visible",
               }}
             >
               <div
