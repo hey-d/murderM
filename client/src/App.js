@@ -40,19 +40,19 @@ function App() {
     {
       key: "VANCE",
       role: "The Butler",
-      img: "../public/vance.png",
+      img: "/VANCE.png",
       bio: "In charge of the manor archives. Deep access to security data logs.",
     },
     {
       key: "SCARLET",
       role: "The Heiress",
-      img: "/images/suspect_scarlet.png",
+      img: "/Scarlett.png",
       bio: "Stands to inherit the estate's entire decentralized token pool.",
     },
     {
       key: "MUSTARD",
       role: "The Colonel",
-      img: "/images/suspect_mustard.png",
+      img: "/mustard.png",
       bio: "Tactical defense expert. Knows every surveillance blind spot.",
     },
   ];
@@ -357,7 +357,7 @@ function App() {
             <img
               src={card.img}
               alt={card.key}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              style={{ width: "120%", height: "100%", objectFit: "fill" }}
               onError={(e) => {
                 e.target.style.display = "none";
               }}

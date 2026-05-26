@@ -76,7 +76,7 @@ function IntroCard({ isOpen, onClose }) {
         <div className="border-t border-cyber-border pt-4 mt-6">
           <button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:to-blue-500 text-slate-900 font-black py-3 rounded text-xs tracking-widest uppercase transition-all duration-300 shadow-lg shadow-cyan-500/20 transform hover:-translate-y-0.5 text-white"
+            className="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 hover:from-cyan-500 hover:to-blue-500 text-slate-900 font-black py-3 rounded text-xs tracking-widest uppercase transition-all duration-300 shadow-lg shadow-cyan-500/20 transform hover:-translate-y-0.5"
           >
             INITIALIZE SYSTEM LINK & ACCESS ENCRYPTED INTERROGATION CORES
           </button>
