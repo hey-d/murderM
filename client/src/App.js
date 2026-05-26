@@ -40,7 +40,7 @@ function App() {
     {
       key: "VANCE",
       role: "The Butler",
-      img: "/images/suspect_vance.png",
+      img: "../public/vance.png",
       bio: "In charge of the manor archives. Deep access to security data logs.",
     },
     {
